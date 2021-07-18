@@ -1,0 +1,36 @@
+OPTION		EQU	$1039
+ADCTL		EQU	$1030
+ADR1		EQU	$1031
+LEDS		EQU	$1004
+TECLAS		EQU	$1003
+ROM		EQU	$C000
+RESET		EQU	$FFFE
+
+
+		ORG     ROM
+		LDAA	#$80 ;; Bit 7 = A/D Power UP
+		STAA	OPTION
+		LDAA	#$30 ;; Bit 5 = Continuous Scan
+			        ;; Bit 4= Multichannel
+		STAA	ADCTL
+
+LOOP:
+		LDAA    TECLAS
+		ADDA	#40
+		LDAB	ADR1
+		CBA	;;Hace A-B
+		BLO	APAGA
+		SUBA	#80
+		CBA	
+		BHI	PRENDE
+		BRA	LOOP
+APAGA
+		CLR	LEDS
+		BRA	LOOP
+PRENDE	
+		LDAA	#1
+		STAA	LEDS
+		BRA	LOOP
+
+		ORG	RESET
+		DW	ROM
